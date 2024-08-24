@@ -27,8 +27,9 @@ from datetime import datetime, timedelta
 from pytz import timezone
 
 INTERVAL = 30
+NUM_PRED = 6
 
-def reward(query: int, response: int) -> float:
+def reward(response: Challenge, close_price: list[float]) -> float:
     """
     Reward the miner response to the dummy request. This method returns a reward
     value for the miner, which is used to update the miner's score.
@@ -36,8 +37,19 @@ def reward(query: int, response: int) -> float:
     Returns:
     - float: The reward value for the miner.
     """
-    bt.logging.info(f"In rewards, query val: {query}, response val: {response}, rewards val: {1.0 if response == query * 2 else 0}")
-    return 1.0 if response == query * 2 else 0
+    
+    prediction_array = np.array(response.output)
+    close_price_array = np.array(close_price)
+    
+    if len(prediction_array) != NUM_PRED:
+        return 0.0
+    elif len(close_price_array) < NUM_PRED:
+        prediction_array = prediction_array[:len(close_price_array)]
+    else:
+        close_price_array = close_price_array[:NUM_PRED]
+        
+    
+    
 
 
 def get_rewards(
