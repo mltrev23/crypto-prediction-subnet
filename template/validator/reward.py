@@ -31,6 +31,15 @@ INTERVAL = 30
 NUM_PRED = 6
 
 
+def diff_direction(actual_direction, prediction_direction):
+    if actual_direction * prediction_direction < 0:
+        return 0
+    diff = actual_direction / prediction_direction
+    if diff > 1:
+        diff = 1 / diff
+    return diff
+    
+
 def get_value_score(close_price_array, prediction_array):
     actual_direction = [close_price_array[i] - close_price_array[i - 1] for i in range(1, len(close_price_array))]
     diff = [(prediction_array[i] - close_price_array[i]) / actual_direction[i - 1] for i in range(1, len(close_price_array))]
@@ -39,9 +48,9 @@ def get_value_score(close_price_array, prediction_array):
 
 
 def get_direction_score(close_price_array, prediction_array):
-    actual_direction = [close_price_array[i] - close_price_array[i - 1] for i in range(1, len(close_price_array))]
-    prediction_direction = [prediction_array[i] - prediction_array[i - 1] for i in range(1, len(prediction_array))]
-    diff_direction_array = [diff_direction(actual_direction, prediction_direction) for i in range(len(actual_direction))]
+    actual_direction_array = [close_price_array[i] - close_price_array[i - 1] for i in range(1, len(close_price_array))]
+    prediction_direction_array = [prediction_array[i] - prediction_array[i - 1] for i in range(1, len(prediction_array))]
+    diff_direction_array = [diff_direction(actual_direction_array[i], prediction_direction_array[i]) for i in range(len(actual_direction_array))]
     return sum(diff_direction_array) * 20
 
     
