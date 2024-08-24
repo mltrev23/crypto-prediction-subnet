@@ -25,6 +25,7 @@ import yfinance as yf
 import time
 from datetime import datetime, timedelta
 from pytz import timezone
+from sklearn.metrics import mean_squared_error
 
 INTERVAL = 30
 NUM_PRED = 6
@@ -47,7 +48,14 @@ def reward(response: Challenge, close_price: list[float]) -> float:
         prediction_array = prediction_array[:len(close_price_array)]
     else:
         close_price_array = close_price_array[:NUM_PRED]
-        
+    
+    try:
+        value_score = get_value_score(prediction_array, close_price_array)
+        directional_score = get_direction_score(close_price_array, prediction_array)
+    except Exception as e:
+        bt.logging.info(f"Validator error in reward function: {e}")
+
+    return directional_score - value_score
     
     
 
