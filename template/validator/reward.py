@@ -37,6 +37,13 @@ def get_value_score(close_price_array, prediction_array):
     rms = np.sqrt(np.mean(np.square(diff)))
     return rms
 
+
+def get_direction_score(close_price_array, prediction_array):
+    actual_direction = [close_price_array[i] - close_price_array[i - 1] for i in range(1, len(close_price_array))]
+    prediction_direction = [prediction_array[i] - prediction_array[i - 1] for i in range(1, len(prediction_array))]
+    diff_direction_array = [diff_direction(actual_direction, prediction_direction) for i in range(len(actual_direction))]
+    return sum(diff_direction_array) * 20
+
     
 def reward(response: Challenge, close_price: list[float]) -> float:
     """
