@@ -165,6 +165,13 @@ def add_miner_args(cls, parser):
         help="Wandb entity to log to.",
     )
 
+    parser.add_argument(
+        "--model",
+        type=str,
+        help="The file name of the model that the miner loads",
+        default='models/lstm.h5'
+    )
+
 
 def add_validator_args(cls, parser):
     """Add validator specific arguments to the parser."""
