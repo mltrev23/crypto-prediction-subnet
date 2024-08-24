@@ -90,8 +90,6 @@ def get_rewards(
 
     bt.logging.info(f"Revealing close prices for this interval: {close_price_revealed}")
     
-    # Get all the reward results by iteratively calling your reward() function.
+     # Get all the reward results by iteratively calling your reward() function.
+    scoring = [reward(response, close_price) if response.prediction != None else 0 for response in responses]
     
-    return np.array(
-        [reward(query, response) for response in responses]
-    )
