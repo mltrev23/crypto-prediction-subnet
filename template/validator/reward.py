@@ -77,14 +77,18 @@ def get_rewards(
             self.resync_metagraph()
         time.sleep(15)
         
-    # current_time_adjusted = rounded_up_time - timedelta(minutes=INTERVAL + 5)
-    # print(rounded_up_time, rounded_up_time.hour, rounded_up_time.minute, current_time_adjusted)
+    current_time_adjusted = rounded_up_time - timedelta(minutes=INTERVAL + 5)
+    print(rounded_up_time, rounded_up_time.hour, rounded_up_time.minute, current_time_adjusted)
     # Prepare to extract close price for this timestamp
     
     data = yf.download('TAO22974-USD', period = '1d', interval = '5m')
     bt.logging.info("Procured data from yahoo finance.")
     
-    
+    bt.logging.info(data.iloc[-7:-1])
+    close_price = data['Close'].iloc[-7:-1].tolist()
+    close_price_revealed = ' '.join(str(price) for price in close_price)
+
+    bt.logging.info(f"Revealing close prices for this interval: {close_price_revealed}")
     
     # Get all the reward results by iteratively calling your reward() function.
     
