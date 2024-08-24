@@ -8,3 +8,4 @@ numpy>=1
 setuptools>=68
 yfinance
 ta
+scikit_learn
