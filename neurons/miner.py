@@ -27,6 +27,10 @@ import template
 # import base miner class which takes care of most of the boilerplate
 from template.base.miner import BaseMinerNeuron
 
+from tensorflow.keras.models import load_model
+
+from base_miner.get_tao_price import get_data, scale_data
+from base_miner.predict import predict
 
 class Miner(BaseMinerNeuron):
     """
@@ -49,9 +53,13 @@ class Miner(BaseMinerNeuron):
         # TODO(developer): Replace with actual implementation logic.
         
         timestamp = synapse.timestamp
-        # prediction = predict(...)
         
-        # synapse.prediction = prediction
+        model_path = f'./{self.config.model}'
+        model = load_model(model_path)
+                
+        prediction = predict(timestamp, model, type = 'lstm')
+        
+        synapse.prediction = list(prediction[0])
         
         return synapse
 
