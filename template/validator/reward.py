@@ -40,8 +40,8 @@ def diff_direction(actual_direction, prediction_direction):
     
 
 def get_value_score(close_price_array, prediction_array):
-    actual_direction = [close_price_array[i] - close_price_array[i - 1] for i in range(1, len(close_price_array))]
-    diff = [(prediction_array[i] - close_price_array[i]) / actual_direction[i - 1] for i in range(1, len(close_price_array))]
+    # actual_direction = [close_price_array[i] - close_price_array[i - 1] for i in range(1, len(close_price_array))]
+    diff = [(prediction_array[i] - close_price_array[i]) / close_price_array[i] * 100 for i in range(1, len(close_price_array))]
     rms = np.sqrt(np.mean(np.square(diff)))
     return rms
 
