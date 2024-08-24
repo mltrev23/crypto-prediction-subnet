@@ -19,7 +19,14 @@
 import numpy as np
 from typing import List
 import bittensor as bt
+from template.protocol import Challenge
+import torch
+import yfinance as yf
+import time
+from datetime import datetime, timedelta
+from pytz import timezone
 
+INTERVAL = 30
 
 def reward(query: int, response: int) -> float:
     """
@@ -35,8 +42,8 @@ def reward(query: int, response: int) -> float:
 
 def get_rewards(
     self,
-    query: int,
-    responses: List[float],
+    query: Challenge,
+    responses: List[Challenge],
 ) -> np.ndarray:
     """
     Returns an array of rewards for the given query and responses.
@@ -48,6 +55,35 @@ def get_rewards(
     Returns:
     - np.ndarray: An array of rewards for the given query and responses.
     """
+    
+    if len(responses) == 0:
+        bt.logging.info("Got no responses. Returning reward tensor of zeros.")
+        return [], torch.zeros_like(0).to(self.device)  # Fallback strategy: Log and return 0.
+    data = yf.download('TAO22974-USD', period = '1mo', interval = '5m')
+    
+    timestamp = query.timestamp
+    timestamp = datetime.fromisoformat(timestamp)
+    
+    # Round up current timestamp and then wait until that time has been hit
+    rounded_up_time = timestamp - timedelta(minutes=timestamp.minute % INTERVAL,
+                                    seconds=timestamp.second,
+                                    microseconds=timestamp.microsecond) + timedelta(minutes=INTERVAL + 5, seconds=30)
+    
+    ny_timezone = timezone('America/New_York')
+    
+    while (datetime.now(ny_timezone) < rounded_up_time - timedelta(minutes=4, seconds=30)):
+        bt.logging.info(f"Waiting for next {INTERVAL}m interval...")
+        if(datetime.now(ny_timezone).minute%10==0):
+            self.resync_metagraph()
+        time.sleep(15)
+        
+    current_time_adjusted = rounded_up_time - timedelta(minutes=INTERVAL + 5)
+    print(rounded_up_time, rounded_up_time.hour, rounded_up_time.minute, current_time_adjusted)
+    
+    
+    
+    
+    
     # Get all the reward results by iteratively calling your reward() function.
     
     return np.array(
