@@ -20,10 +20,12 @@
 import time
 import bittensor as bt
 
-from template.protocol import Dummy
+from template.protocol import Challenge
 from template.validator.reward import get_rewards
 from template.utils.uids import get_random_uids
 
+from pytz import timezone
+import datetime
 
 async def forward(self):
     """
@@ -38,13 +40,19 @@ async def forward(self):
     # TODO(developer): Define how the validator selects a miner to query, how often, etc.
     # get_random_uids is an example method, but you can replace it with your own.
     miner_uids = get_random_uids(self, k=self.config.neuron.sample_size)
+    
+    ny_timezone = timezone('America/New_York')
+    current_time_ny = datetime.now(ny_timezone)
+    timestamp = current_time_ny.isoformat()
+    
+    synapse = Challenge(timestamp = timestamp)
 
     # The dendrite client queries the network.
     responses = await self.dendrite(
         # Send the query to selected miner axons in the network.
         axons=[self.metagraph.axons[uid] for uid in miner_uids],
         # Construct a dummy query. This simply contains a single integer.
-        synapse=Dummy(dummy_input=self.step),
+        synapse=synapse,
         # All responses have the deserialize function called on them before returning.
         # You are encouraged to define your own deserialization function.
         deserialize=True,
