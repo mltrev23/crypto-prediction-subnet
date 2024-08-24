@@ -25,7 +25,6 @@ import yfinance as yf
 import time
 from datetime import datetime, timedelta
 from pytz import timezone
-from sklearn.metrics import mean_squared_error
 
 INTERVAL = 30
 NUM_PRED = 6
@@ -52,6 +51,13 @@ def get_direction_score(close_price_array, prediction_array):
     prediction_direction_array = [prediction_array[i] - prediction_array[i - 1] for i in range(1, len(prediction_array))]
     diff_direction_array = [diff_direction(actual_direction_array[i], prediction_direction_array[i]) for i in range(len(actual_direction_array))]
     return sum(diff_direction_array) * 20
+
+
+def normalize(scoring):
+    min = min(scoring)
+    max = max(scoring)
+    normalized_scoring = [(x - min) / (max - min) for x in scoring]
+    return normalized_scoring
 
     
 def reward(response: Challenge, close_price: list[float]) -> float:
@@ -136,4 +142,6 @@ def get_rewards(
     
      # Get all the reward results by iteratively calling your reward() function.
     scoring = [reward(response, close_price) if response.prediction != None else 0 for response in responses]
+    scoring = normalize(scoring)
+    return torch.FloatTensor(scoring)
     
