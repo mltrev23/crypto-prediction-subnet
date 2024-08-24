@@ -77,10 +77,12 @@ def get_rewards(
             self.resync_metagraph()
         time.sleep(15)
         
-    current_time_adjusted = rounded_up_time - timedelta(minutes=INTERVAL + 5)
-    print(rounded_up_time, rounded_up_time.hour, rounded_up_time.minute, current_time_adjusted)
+    # current_time_adjusted = rounded_up_time - timedelta(minutes=INTERVAL + 5)
+    # print(rounded_up_time, rounded_up_time.hour, rounded_up_time.minute, current_time_adjusted)
+    # Prepare to extract close price for this timestamp
     
-    
+    data = yf.download('TAO22974-USD', period = '1d', interval = '5m')
+    bt.logging.info("Procured data from yahoo finance.")
     
     
     
