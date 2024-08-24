@@ -30,6 +30,14 @@ from sklearn.metrics import mean_squared_error
 INTERVAL = 30
 NUM_PRED = 6
 
+
+def get_value_score(close_price_array, prediction_array):
+    actual_direction = [close_price_array[i] - close_price_array[i - 1] for i in range(1, len(close_price_array))]
+    diff = [(prediction_array[i] - close_price_array[i]) / actual_direction[i - 1] for i in range(1, len(close_price_array))]
+    rms = np.sqrt(np.mean(np.square(diff)))
+    return rms
+
+    
 def reward(response: Challenge, close_price: list[float]) -> float:
     """
     Reward the miner response to the dummy request. This method returns a reward
@@ -44,13 +52,15 @@ def reward(response: Challenge, close_price: list[float]) -> float:
     
     if len(prediction_array) != NUM_PRED:
         return 0.0
-    elif len(close_price_array) < NUM_PRED:
-        prediction_array = prediction_array[:len(close_price_array)]
-    else:
-        close_price_array = close_price_array[:NUM_PRED]
+    # elif len(close_price_array) < NUM_PRED:
+    #     prediction_array = prediction_array[:len(close_price_array)]
+    # else:
+    #     close_price_array = close_price_array[:NUM_PRED]
+    
+    prediction_array.insert(0, close_price_array[0])
     
     try:
-        value_score = get_value_score(prediction_array, close_price_array)
+        value_score = get_value_score(close_price_array, prediction_array)
         directional_score = get_direction_score(close_price_array, prediction_array)
     except Exception as e:
         bt.logging.info(f"Validator error in reward function: {e}")
@@ -58,8 +68,6 @@ def reward(response: Challenge, close_price: list[float]) -> float:
     return directional_score - value_score
     
     
-
-
 def get_rewards(
     self,
     query: Challenge,
@@ -105,7 +113,7 @@ def get_rewards(
     bt.logging.info("Procured data from yahoo finance.")
     
     bt.logging.info(data.iloc[-7:-1])
-    close_price = data['Close'].iloc[-7:-1].tolist()
+    close_price = data['Close'].iloc[-8:-1].tolist()
     close_price_revealed = ' '.join(str(price) for price in close_price)
 
     bt.logging.info(f"Revealing close prices for this interval: {close_price_revealed}")
