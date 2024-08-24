@@ -9,3 +9,4 @@ setuptools>=68
 yfinance
 ta
 scikit_learn
+tensorflow
