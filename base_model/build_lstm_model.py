@@ -6,8 +6,9 @@ from sklearn.metrics import mean_squared_error
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 import os
+import joblib
 
-def create_and_save_base_model_lstm(scaler:MinMaxScaler, X_scaled:np.ndarray, y_scaled:np.ndarray) -> float:
+def create_base_lstm(scaler:MinMaxScaler, X_scaled:np.ndarray, y_scaled:np.ndarray) -> float:
     model_name = "models/base_lstm"
 
     # Reshape input for LSTM
@@ -46,3 +47,35 @@ def create_and_save_base_model_lstm(scaler:MinMaxScaler, X_scaled:np.ndarray, y_
     print(f'Mean Squared Error: {mse}')
     
     return mse
+
+def create_base_regression(scaler:MinMaxScaler, X_scaled:np.ndarray, y_scaled:np.ndarray) -> float:
+    model_name = "mining_models/base_linear_regression"
+
+    # Split data into training and testing
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled, test_size=0.2, random_state=42)
+
+    # LSTM model - all hyperparameters are baseline params - should be changed according to your required
+    # architecture. LSTMs are also not the only way to do this, can be done using any algo deemed fit by
+    # the creators of the miner.
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+
+    '''with h5py.File(f'{model_name}.h5', 'w') as hf:
+        hf.create_dataset('coefficients', data=model.coef_)
+        hf.create_dataset('intercept', data=model.intercept_)'''
+    joblib.dump(model, f"{model_name}.joblib")
+
+    # Predict the prices - this is just for a local test, this prediction just allows
+    # miners to assess the performance of their models on real data.
+    predicted_prices = model.predict(X_test)
+
+    # Rescale back to original range
+    predicted_prices = scaler.inverse_transform(predicted_prices.reshape(-1, 1))
+    y_test_rescaled = scaler.inverse_transform(y_test.reshape(-1, 1))
+
+    # Evaluate
+    mse = mean_squared_error(y_test_rescaled, predicted_prices)
+    print(f'Mean Squared Error: {mse}')
+    
+    return mse
+
