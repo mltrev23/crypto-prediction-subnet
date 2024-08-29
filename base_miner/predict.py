@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from base_miner.get_tao_price import get_data, scale_data
 import pandas as pd
 from datetime import timedelta
