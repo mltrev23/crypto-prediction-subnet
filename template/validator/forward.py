@@ -40,6 +40,7 @@ async def forward(self):
     # TODO(developer): Define how the validator selects a miner to query, how often, etc.
     # get_random_uids is an example method, but you can replace it with your own.
     miner_uids = get_random_uids(self, k=self.config.neuron.sample_size)
+    bt.logging.info(f'miner_uids: {miner_uids}')
     
     ny_timezone = timezone('America/New_York')
     current_time_ny = datetime.now(ny_timezone)

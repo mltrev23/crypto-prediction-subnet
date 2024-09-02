@@ -26,7 +26,7 @@ import time
 from datetime import datetime, timedelta
 from pytz import timezone
 
-INTERVAL = 30
+INTERVAL = 1
 NUM_PRED = 6
 
 
@@ -123,7 +123,7 @@ def get_rewards(
     
     while (datetime.now(ny_timezone) < rounded_up_time - timedelta(minutes=4, seconds=30)):
         bt.logging.info(f"Waiting for next {INTERVAL}m interval...")
-        if(datetime.now(ny_timezone).minute%10==0):
+        if(datetime.now(ny_timezone).minute%INTERVAL==0):
             self.resync_metagraph()
         time.sleep(15)
         
