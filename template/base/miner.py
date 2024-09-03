@@ -190,3 +190,4 @@ class BaseMinerNeuron(BaseNeuron):
 
         # Sync the metagraph.
         self.metagraph.sync(subtensor=self.subtensor)
+        self.metagraph.last_update[self.uid] = self.block
