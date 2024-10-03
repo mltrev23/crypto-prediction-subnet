@@ -9,16 +9,18 @@ def predict(timestamp: datetime, model, type) -> float:
     scaler, _, _ = scale_data(data)
     
     data['Datetime'] = pd.to_datetime(data['Datetime'])
+    print('-----------------------------------------------------------------------')
+    print(data)
 
     # The timestamp sent by the validator need not be associated with an exact 5m interval
     # It's on the miners to ensure that the time is rounded down to the last completed 5 min candle
-    current_time = datetime.fromisoformat(timestamp)
+    current_time = datetime.fromisoformat(timestamp).utcnow()
     interval_minutes = 5
     pred_time = current_time - timedelta(minutes=current_time.minute % interval_minutes,
                                 seconds=current_time.second,
                                 microseconds=current_time.microsecond)
 
-    matching_row = data[data['Datetime'] == pred_time]
+    matching_row = data[data['Datetime'] == pred_time - timedelta(minutes=interval_minutes)]
 
     print(pred_time, matching_row)
 
@@ -36,7 +38,7 @@ def predict(timestamp: datetime, model, type) -> float:
         print(input)
 
     prediction = model.predict(input)
-    if(type!='regression'):
+    if(type != 'regression'):
         prediction = scaler.inverse_transform(prediction.reshape(1, -1))
 
     print(prediction)

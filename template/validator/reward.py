@@ -108,7 +108,7 @@ def get_rewards(
     
     if len(responses) == 0:
         bt.logging.info("Got no responses. Returning reward tensor of zeros.")
-        return [], torch.zeros_like(0).to(self.device)  # Fallback strategy: Log and return 0.
+        return np.zeros(1)
     data = yf.download('TAO22974-USD', period = '1mo', interval = '5m')
     
     timestamp = query.timestamp
@@ -143,5 +143,5 @@ def get_rewards(
      # Get all the reward results by iteratively calling your reward() function.
     scoring = [reward(response, close_price) if response.prediction != None else 0 for response in responses]
     scoring = normalize(scoring)
-    return torch.FloatTensor(scoring)
+    return np.array(torch.FloatTensor(scoring).to('cpu'))
     

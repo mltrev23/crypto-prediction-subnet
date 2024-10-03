@@ -56,10 +56,13 @@ class Miner(BaseMinerNeuron):
         
         model_path = f'./{self.config.model}'
         model = load_model(model_path)
+        bt.logging.info('Model loaded')
                 
         prediction = predict(timestamp, model, type = 'lstm')
+        bt.logging.info(f'Prediction: {prediction}')
         
         synapse.prediction = list(prediction[0])
+        bt.logging.info(f'Synapse returned: {synapse}')
         
         return synapse
 
