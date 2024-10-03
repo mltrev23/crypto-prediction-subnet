@@ -16,13 +16,12 @@ def get_data() -> DataFrame:
     output = DataFrame()
     for i in range(1, 7):
         output[f'NextClose{i}'] = input['Close'].shift(-1 * i)
-    print(output)
     
     input.reset_index(inplace = True)
     
     return input, output
 
-def scale_data(input: DataFrame, output: DataFrame) -> Tuple[MinMaxScaler, np.ndarray, np.ndarray]:
+def scale_data(input: DataFrame, output: DataFrame) -> Tuple[MinMaxScaler, MinMaxScaler, np.ndarray, np.ndarray]:
     X = input[['Open', 'High', 'Low', 'Volume', 'SMA_50', 'SMA_200', 'RSI', 'CCI', 'Momentum']].values
 
     # Prepare target variable
@@ -31,8 +30,9 @@ def scale_data(input: DataFrame, output: DataFrame) -> Tuple[MinMaxScaler, np.nd
     y = y.reshape(-1, 6)
 
     # Scale features
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    X_scaled = scaler.fit_transform(X)
-    y_scaled = scaler.transform(y)
+    X_scaler = MinMaxScaler(feature_range=(0, 1))
+    y_scaler = MinMaxScaler(feature_range=(0, 1))
+    X_scaled = X_scaler.fit_transform(X)
+    y_scaled = y_scaler.fit_transform(y)
 
-    return scaler, X_scaled, y_scaled
+    return X_scaler, y_scaler, X_scaled, y_scaled

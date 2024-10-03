@@ -10,7 +10,7 @@ import joblib
 from base_miner.get_tao_price import get_data, scale_data
 import pandas as pd
 
-def create_base_lstm(scaler:MinMaxScaler, X_scaled:np.ndarray, y_scaled:np.ndarray) -> float:
+def create_base_lstm(X_scaler:MinMaxScaler, y_scaler:MinMaxScaler, X_scaled:np.ndarray, y_scaled:np.ndarray) -> float:
     model_name = "models/base_lstm"
 
     # Reshape input for LSTM
@@ -41,8 +41,8 @@ def create_base_lstm(scaler:MinMaxScaler, X_scaled:np.ndarray, y_scaled:np.ndarr
     predicted_prices = model.predict(X_test)
 
     # Rescale back to original range
-    predicted_prices = scaler.inverse_transform(predicted_prices)
-    y_test_rescaled = scaler.inverse_transform(y_test.reshape(-1, 6))
+    predicted_prices = X_scaler.inverse_transform(predicted_prices)
+    y_test_rescaled = y_scaler.inverse_transform(y_test.reshape(-1, 6))
 
     # Evaluate
     mse = mean_squared_error(y_test_rescaled, predicted_prices)
@@ -83,7 +83,7 @@ def create_base_regression(scaler:MinMaxScaler, X_scaled:np.ndarray, y_scaled:np
 
 if __name__ == '__main__':
     input, output = get_data()
-    scaler, X_data, y_data = scale_data(input, output)
+    X_scaler, y_scaler, X_data, y_data = scale_data(input, output)
     
     input['Datetime'] = pd.to_datetime(input['Datetime'])
 
@@ -98,4 +98,4 @@ if __name__ == '__main__':
         input = np.reshape(input, (-1, 1, input.shape[1]))
         print(input)
 
-    if(type == 'lstm'): create_base_lstm(scaler = scaler, X_scaled = X_data, y_scaled = y_data)
+    if(type == 'lstm'): create_base_lstm(X_scaler = X_scaler, y_scaler = y_scaler, X_scaled = X_data, y_scaled = y_data)

@@ -4,13 +4,11 @@ import pandas as pd
 from datetime import timedelta
 import numpy as np
 
-def predict(timestamp: datetime, model, type) -> float:
-    data = get_data()
-    scaler, _, _ = scale_data(data)
+def predict(timestamp: datetime, model, model_type) -> float:
+    data, _ = get_data()
+    X_scaler, y_scaler, _, _ = scale_data(data, _)
     
     data['Datetime'] = pd.to_datetime(data['Datetime'])
-    print('-----------------------------------------------------------------------')
-    print(data)
 
     # The timestamp sent by the validator need not be associated with an exact 5m interval
     # It's on the miners to ensure that the time is rounded down to the last completed 5 min candle
@@ -20,9 +18,11 @@ def predict(timestamp: datetime, model, type) -> float:
                                 seconds=current_time.second,
                                 microseconds=current_time.microsecond)
 
-    matching_row = data[data['Datetime'] == pred_time - timedelta(minutes=interval_minutes)]
+    matching_row = data[data['Datetime'] == pd.Timestamp(pred_time - timedelta(minutes=interval_minutes))]
+    print('-----------------------------------------------------------------------')
+    print(data['Datetime'] == pd.Timestamp(pred_time - timedelta(minutes=interval_minutes)))
 
-    print(pred_time, matching_row)
+    print(pd.Timestamp(pred_time - timedelta(minutes=interval_minutes)), matching_row)
 
     # Check if matching_row is empty
     if matching_row.empty:
@@ -32,14 +32,14 @@ def predict(timestamp: datetime, model, type) -> float:
     # data.to_csv('mining_models/base_miner_data.csv')
     input = matching_row[['Open', 'High', 'Low', 'Volume', 'SMA_50', 'SMA_200', 'RSI', 'CCI', 'Momentum']]
 
-    if(type != 'regression'):
+    if(model_type != 'regression'):
         input = np.array(input, dtype = np.float32).reshape(1, -1)
         input = np.reshape(input, (1, 1, input.shape[1]))
         print(input)
 
     prediction = model.predict(input)
-    if(type != 'regression'):
-        prediction = scaler.inverse_transform(prediction.reshape(1, -1))
+    if(model_type != 'regression'):
+        prediction = y_scaler.inverse_transform(prediction.reshape(1, -1))
 
     print(prediction)
     return prediction
