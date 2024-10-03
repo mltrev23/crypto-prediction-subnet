@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import timedelta
 import numpy as np
 
-def predict(timestamp: datetime, model, model_type) -> float:
+def predict(timestamp: str, model, model_type) -> float:
     data, _ = get_data()
     X_scaler, y_scaler, _, _ = scale_data(data, _)
     
@@ -12,17 +12,14 @@ def predict(timestamp: datetime, model, model_type) -> float:
 
     # The timestamp sent by the validator need not be associated with an exact 5m interval
     # It's on the miners to ensure that the time is rounded down to the last completed 5 min candle
-    current_time = datetime.fromisoformat(timestamp).utcnow()
+    current_time = datetime.fromisoformat(timestamp)
+    
     interval_minutes = 5
     pred_time = current_time - timedelta(minutes=current_time.minute % interval_minutes,
                                 seconds=current_time.second,
                                 microseconds=current_time.microsecond)
 
-    matching_row = data[data['Datetime'] == pd.Timestamp(pred_time - timedelta(minutes=interval_minutes))]
-    print('-----------------------------------------------------------------------')
-    print(data['Datetime'] == pd.Timestamp(pred_time - timedelta(minutes=interval_minutes)))
-
-    print(pd.Timestamp(pred_time - timedelta(minutes=interval_minutes)), matching_row)
+    matching_row = data[data['Datetime'] == pd.Timestamp(pred_time - timedelta(minutes=interval_minutes))]    
 
     # Check if matching_row is empty
     if matching_row.empty:
