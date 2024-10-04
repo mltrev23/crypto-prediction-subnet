@@ -127,7 +127,7 @@ def get_rewards(
             self.resync_metagraph()
         time.sleep(15)
         
-    current_time_adjusted = rounded_up_time - timedelta(minutes=INTERVAL + 5)
+    current_time_adjusted = rounded_up_time + timedelta(minutes=INTERVAL + 5)
     print(rounded_up_time, rounded_up_time.hour, rounded_up_time.minute, current_time_adjusted)
     # Prepare to extract close price for this timestamp
     
@@ -139,6 +139,7 @@ def get_rewards(
     close_price_revealed = ' '.join(str(price) for price in close_price)
 
     bt.logging.info(f"Revealing close prices for this interval: {close_price_revealed}")
+    bt.logging.info(f"Revealing predicted prices for this interval: {responses}")
     
      # Get all the reward results by iteratively calling your reward() function.
     scoring = [reward(response, close_price) if response.prediction != None else 0 for response in responses]

@@ -41,7 +41,7 @@ def create_base_lstm(X_scaler:MinMaxScaler, y_scaler:MinMaxScaler, X_scaled:np.n
     predicted_prices = model.predict(X_test)
 
     # Rescale back to original range
-    predicted_prices = X_scaler.inverse_transform(predicted_prices)
+    predicted_prices = y_scaler.inverse_transform(predicted_prices)
     y_test_rescaled = y_scaler.inverse_transform(y_test.reshape(-1, 6))
 
     # Evaluate
@@ -83,6 +83,13 @@ def create_base_regression(scaler:MinMaxScaler, X_scaled:np.ndarray, y_scaled:np
 
 if __name__ == '__main__':
     input, output = get_data()
+    
+    output = output.dropna()
+    input = input[input['Datetime'].isin(output['Datetime'])]
+    
+    input = input.dropna()
+    output = output[output['Datetime'].isin(input['Datetime'])]
+    
     X_scaler, y_scaler, X_data, y_data = scale_data(input, output)
     
     input['Datetime'] = pd.to_datetime(input['Datetime'])

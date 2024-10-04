@@ -38,5 +38,4 @@ def predict(timestamp: str, model, model_type) -> float:
     if(model_type != 'regression'):
         prediction = y_scaler.inverse_transform(prediction.reshape(1, -1))
 
-    print(prediction)
     return prediction

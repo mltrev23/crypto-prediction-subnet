@@ -1,24 +1,30 @@
 import yfinance as yf
 import ta
 from pandas import DataFrame
+import pandas as pd
 from typing import Tuple
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 
+NUMBER_OF_PREDICTIONS = 6
+
 def get_data() -> DataFrame:
     input = yf.download('TAO22974-USD', period = '1mo', interval = '5m')
+    
+    input.reset_index(inplace = True)
     
     input['SMA_50'] = input['Close'].rolling(window = 50).mean()
     input['SMA_200'] = input['Close'].rolling(window = 200).mean()
     input['RSI'] = ta.momentum.RSIIndicator(input['Close']).rsi()
     input['CCI'] = ta.trend.CCIIndicator(input['High'], input['Low'], input['Close']).cci()
     input['Momentum'] = ta.momentum.ROCIndicator(input['Close']).roc()
+    
     output = DataFrame()
-    for i in range(1, 7):
+    output['Datetime'] = input['Datetime']
+    
+    for i in range(1, 1 + NUMBER_OF_PREDICTIONS):
         output[f'NextClose{i}'] = input['Close'].shift(-1 * i)
-    
-    input.reset_index(inplace = True)
-    
+        
     return input, output
 
 def scale_data(input: DataFrame, output: DataFrame) -> Tuple[MinMaxScaler, MinMaxScaler, np.ndarray, np.ndarray]:

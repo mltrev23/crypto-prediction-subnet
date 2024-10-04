@@ -30,4 +30,4 @@ class Challenge(bt.Synapse):
     prediction: typing.Optional[List[float]] = Field(default = None, title = 'Prediction Result', description = 'Next 6 predicted values')
 
     def deserialize(self) -> List[float]:
-        return self.output
+        return self.prediction
