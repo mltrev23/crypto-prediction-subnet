@@ -91,6 +91,7 @@ if __name__ == '__main__':
     output = output[output['Datetime'].isin(input['Datetime'])]
     
     X_scaler, y_scaler, X_data, y_data = scale_data(input, output)
+    output.drop(columns = 'Datetime', inplace = True)
     
     input['Datetime'] = pd.to_datetime(input['Datetime'])
 
