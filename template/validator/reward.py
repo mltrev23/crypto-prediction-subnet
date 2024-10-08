@@ -26,7 +26,7 @@ import time
 from datetime import datetime, timedelta
 from pytz import timezone
 
-INTERVAL = 30
+INTERVAL = 1
 NUM_PRED = 6
 
 
@@ -108,7 +108,7 @@ def get_rewards(
     
     if len(responses) == 0:
         bt.logging.info("Got no responses. Returning reward tensor of zeros.")
-        return [], torch.zeros_like(0).to(self.device)  # Fallback strategy: Log and return 0.
+        return np.zeros(1)
     data = yf.download('TAO22974-USD', period = '1mo', interval = '5m')
     
     timestamp = query.timestamp
@@ -123,11 +123,11 @@ def get_rewards(
     
     while (datetime.now(ny_timezone) < rounded_up_time - timedelta(minutes=4, seconds=30)):
         bt.logging.info(f"Waiting for next {INTERVAL}m interval...")
-        if(datetime.now(ny_timezone).minute%10==0):
+        if(datetime.now(ny_timezone).minute%INTERVAL==0):
             self.resync_metagraph()
         time.sleep(15)
         
-    current_time_adjusted = rounded_up_time - timedelta(minutes=INTERVAL + 5)
+    current_time_adjusted = rounded_up_time + timedelta(minutes=INTERVAL + 5)
     print(rounded_up_time, rounded_up_time.hour, rounded_up_time.minute, current_time_adjusted)
     # Prepare to extract close price for this timestamp
     
@@ -139,9 +139,10 @@ def get_rewards(
     close_price_revealed = ' '.join(str(price) for price in close_price)
 
     bt.logging.info(f"Revealing close prices for this interval: {close_price_revealed}")
+    bt.logging.info(f"Revealing predicted prices for this interval: {responses}")
     
      # Get all the reward results by iteratively calling your reward() function.
     scoring = [reward(response, close_price) if response.prediction != None else 0 for response in responses]
     scoring = normalize(scoring)
-    return torch.FloatTensor(scoring)
+    return np.array(torch.FloatTensor(scoring).to('cpu'))
     
