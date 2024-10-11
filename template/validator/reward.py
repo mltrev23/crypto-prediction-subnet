@@ -54,9 +54,9 @@ def get_direction_score(close_price_array, prediction_array):
 
 
 def normalize(scoring):
-    min = min(scoring)
-    max = max(scoring)
-    normalized_scoring = [(x - min) / (max - min) for x in scoring]
+    _min = min(scoring)
+    _max = max(scoring)
+    normalized_scoring = [(x - _min) / (_max - _min) for x in scoring]
     return normalized_scoring
 
     
@@ -74,12 +74,12 @@ def reward(response: Challenge, close_price: list[float]) -> float:
     
     if len(prediction_array) != NUM_PRED:
         return 0.0
-    # elif len(close_price_array) < NUM_PRED:
-    #     prediction_array = prediction_array[:len(close_price_array)]
-    # else:
-    #     close_price_array = close_price_array[:NUM_PRED]
+    elif len(close_price_array) < NUM_PRED:
+        prediction_array = prediction_array[:len(close_price_array)]
+    else:
+        close_price_array = close_price_array[:NUM_PRED]
     
-    prediction_array.insert(0, close_price_array[0])
+    # np.insert(prediction_array, 0, close_price_array[0])
     
     try:
         value_score = get_value_score(close_price_array, prediction_array)
