@@ -10,3 +10,4 @@ yfinance
 ta
 scikit_learn
 tensorflow
+sentry-sdk

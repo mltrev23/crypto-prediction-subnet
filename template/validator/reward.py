@@ -69,7 +69,7 @@ def reward(response: Challenge, close_price: list[float]) -> float:
     - float: The reward value for the miner.
     """
     
-    prediction_array = np.array(response.output)
+    prediction_array = np.array(response.prediction)
     close_price_array = np.array(close_price)
     
     if len(prediction_array) != NUM_PRED:
@@ -135,7 +135,7 @@ def get_rewards(
     bt.logging.info("Procured data from yahoo finance.")
     
     bt.logging.info(data.iloc[-7:-1])
-    close_price = data['Close'].iloc[-8:-1].tolist()
+    close_price = data['Close'].iloc[-7:-1].tolist()
     close_price_revealed = ' '.join(str(price) for price in close_price)
 
     bt.logging.info(f"Revealing close prices for this interval: {close_price_revealed}")
