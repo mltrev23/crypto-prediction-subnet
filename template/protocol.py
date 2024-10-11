@@ -28,6 +28,3 @@ class Challenge(bt.Synapse):
 
     # Optional request output, filled by receiving axon.
     prediction: typing.Optional[List[float]] = Field(default = None, title = 'Prediction Result', description = 'Next 6 predicted values')
-
-    def deserialize(self) -> List[float]:
-        return self.prediction

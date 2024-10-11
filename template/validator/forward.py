@@ -62,8 +62,8 @@ async def forward(self):
     # Log the results for monitoring purposes.
     bt.logging.info(f"Received responses: {responses}")
     
-    successful_responses = [response for response in responses if response != None]
-    successful_uids = [miner_uids[i] for i, response in zip(miner_uids, responses) if response != None]
+    successful_responses = [response for response in responses if response.prediction != None]
+    successful_uids = [miner_uids[i] for i, response in zip(miner_uids, responses) if response.prediction != None]
     bt.logging.info(f"Successful responses and uids: {successful_responses}, {successful_uids}")
 
     # TODO(developer): Define how the validator scores responses.
