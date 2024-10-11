@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import timedelta
 import numpy as np
 
-def predict(timestamp: str, model, model_type) -> float:
+def predict(timestamp: str, model, model_type) -> list[float]:
     data, _ = get_data()
     X_scaler, y_scaler, _, _ = scale_data(data, _)
     
@@ -18,13 +18,15 @@ def predict(timestamp: str, model, model_type) -> float:
     pred_time = current_time - timedelta(minutes=current_time.minute % interval_minutes,
                                 seconds=current_time.second,
                                 microseconds=current_time.microsecond)
+    print(f"data['Datetime']: {data['Datetime']}")
+    print(f'pd.Timestamp(pred_time - timedelta(minutes=interval_minutes)): {pd.Timestamp(pred_time - timedelta(minutes=interval_minutes))}')
 
     matching_row = data[data['Datetime'] == pd.Timestamp(pred_time - timedelta(minutes=interval_minutes))]    
 
     # Check if matching_row is empty
     if matching_row.empty:
         print("No matching row found for the given timestamp.")
-        return 0.0
+        return [0.0] * 6
 
     # data.to_csv('mining_models/base_miner_data.csv')
     input = matching_row[['Open', 'High', 'Low', 'Volume', 'SMA_50', 'SMA_200', 'RSI', 'CCI', 'Momentum']]
@@ -38,4 +40,4 @@ def predict(timestamp: str, model, model_type) -> float:
     if(model_type != 'regression'):
         prediction = y_scaler.inverse_transform(prediction.reshape(1, -1))
 
-    return prediction
+    return prediction[0]

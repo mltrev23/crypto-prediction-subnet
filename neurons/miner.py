@@ -29,6 +29,19 @@ from template.base.miner import BaseMinerNeuron
 
 from tensorflow.keras.models import load_model
 
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://f05cfc87d0e6869bf262814454693f16@o4508101652250624.ingest.us.sentry.io/4508101676105728",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
+
 from base_miner.get_tao_price import get_data, scale_data
 from base_miner.predict import predict
 
@@ -61,7 +74,7 @@ class Miner(BaseMinerNeuron):
         prediction = predict(timestamp, model, model_type = 'lstm')
         bt.logging.info(f'Prediction: {prediction}')
         
-        synapse.prediction = list(prediction[0])
+        synapse.prediction = prediction
         bt.logging.info(f'Synapse returned: {synapse}')
         
         return synapse
