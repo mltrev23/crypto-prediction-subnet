@@ -56,8 +56,7 @@ def get_direction_score(close_price_array, prediction_array):
 def normalize(scoring):
     _min = min(scoring)
     _max = max(scoring)
-    normalized_scoring = [(x - _min) / (_max - _min) for x in scoring]
-    return normalized_scoring
+    return [(x - _min) / (_max - _min) for x in scoring]
 
     
 def reward(response: Challenge, close_price: list[float]) -> float:
